@@ -20,7 +20,7 @@ const doctorSchema = new mongoose.Schema({
 
     phone: {
         type: String,
-        required: true,
+        required: false
     },
 
     gender: {
@@ -31,17 +31,29 @@ const doctorSchema = new mongoose.Schema({
 
     qualification: {
         type: String,
-        required: true
+        required: false
     },
 
     qualification_url : {
         type : String,
-        required : true
+        required : false
     },
 
     experience: {
         type: Number,
-        required: true
+        required: false
+    },
+
+    isProfileCompleted : {
+        type : bool,
+        required : true,
+        default : false
+    },
+
+    isVerified : {
+        type : bool,
+        required : true,
+        default : false
     }
 
 });
