@@ -45,13 +45,13 @@ const doctorSchema = new mongoose.Schema({
     },
 
     isProfileCompleted : {
-        type : bool,
+        type : Boolean,
         required : true,
         default : false
     },
 
     isVerified : {
-        type : bool,
+        type : Boolean,
         required : true,
         default : false
     }
