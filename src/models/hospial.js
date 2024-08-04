@@ -23,7 +23,13 @@ const hospitalSchema = new mongoose.Schema({
     address_id : mongoose.Schema.Types.ObjectId,
     ref: 'Address',
     required: true
-  }
+  },
+
+  password : {
+    type : String,
+    required : true
+}
+
 });
 
 const Hospital = mongoose.model('Hospital', hospitalSchema);
