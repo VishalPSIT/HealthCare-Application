@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const Hospital = require('./hospital.js'); 
-const User = require('./user.js'); 
 
 const bookingSchema = new mongoose.Schema({
   day: {
@@ -19,7 +17,7 @@ const bookingSchema = new mongoose.Schema({
     ref: 'Hospital',
     required: true
   }
-});
+}, { timestamps: true });
 
 const Booking = mongoose.model('Booking', bookingSchema);
 

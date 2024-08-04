@@ -1,8 +1,19 @@
 const mongoose = require('mongoose');
-const Doctor = require('./doctor.js'); 
-const Hospital = require('./hospital.js');
 
 const scheduleSchema = new mongoose.Schema({
+
+  is_verified : {
+    type : Boolean,
+    required : true,
+    default: false
+  },
+
+  Status_message :{
+    type : String,
+    required : true,
+    enum : ['Pending Verification','Declined by Doctor','Verified'],
+    default : 'Pending'
+  },
 
   day: {
     type: Date,
@@ -35,6 +46,11 @@ const scheduleSchema = new mongoose.Schema({
   appointment_limit: {
     type: Number,
     required: true
+  },
+
+  fees : {
+    type : Number,
+    required : true
   }
 
 });
