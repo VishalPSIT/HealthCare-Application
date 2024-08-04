@@ -14,19 +14,24 @@ const doctorSchema = new mongoose.Schema({
 
     email: {
         type: String,
-        required: true,
+        required: false,
         unique: true,
     },
 
     phone: {
         type: String,
-        required: false
+        required: true,
     },
 
     gender: {
         type: String,
         required: true,
         enum: ['Male', 'Female', 'Other']
+    },
+
+    UID : {
+        type: String,
+        required: true
     },
 
     qualification: {
@@ -45,13 +50,13 @@ const doctorSchema = new mongoose.Schema({
     },
 
     isProfileCompleted : {
-        type : bool,
+        type : Boolean,
         required : true,
         default : false
     },
 
     isVerified : {
-        type : bool,
+        type : Boolean,
         required : true,
         default : false
     }

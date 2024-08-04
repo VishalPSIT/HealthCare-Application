@@ -1,6 +1,4 @@
-// hospital.js
 const mongoose = require('mongoose');
-const addressSchema = require('./address');
 
 const hospitalSchema = new mongoose.Schema({
 
@@ -22,7 +20,8 @@ const hospitalSchema = new mongoose.Schema({
   },
 
   address: {
-    type: addressSchema,
+    address_id : mongoose.Schema.Types.ObjectId,
+    ref: 'Address',
     required: true
   }
 });
