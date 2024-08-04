@@ -1,0 +1,42 @@
+Routes
+
+user sign-in
+user sign-up
+update-user-profile
+user-explore-nearby-hospitals
+user-explore-nearby-hospitals : specialty
+search-doctor-and-hospital-list: name
+get-top-doctor-list : specialty
+get-doctor : doctor-name || doctor-specialty
+get-doctor-profile
+get-hospital-details
+get-schedule-hospital
+book-hospital-bed
+cancel-booked-hospital-bed
+get-doctor-schedule
+book appointment
+cancel-appointment
+
+Hospital-sign-in
+Hospital-sign-up
+update-hospital-details
+increase-bed-strength
+add-doctor
+request-add-schedule
+delete-schedule
+request-update-schedule
+update-fees
+update-doctor-details(Verification required)
+get-booked-bed-details
+discharge-and-free-bed
+get-appointment
+generate-receipt
+
+doctor-sign-up
+doctor-sign-in
+upload-qualification
+update-doctor-details
+request-schedule-delete
+verify-add-schedule
+get-appointment
+
