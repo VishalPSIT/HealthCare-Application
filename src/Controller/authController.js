@@ -138,7 +138,7 @@ exports.hospitalSignUp = async(req,res)=>{
 
             }
             else{
-                const jsonObj = {success:false,message:"User already exists"}
+                const jsonObj = {success:false,message:"Hospital already exists"}
                 successResponse(req,res,400,jsonObj);
             }
         }
