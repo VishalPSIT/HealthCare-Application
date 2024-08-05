@@ -1,10 +1,11 @@
 const express = require("express");
-const {userSignUp, userSignIn, userUpdateProfile} = require("../controllers/authController")
+const {userSignUp, userSignIn, userUpdateProfile, hospitalSignUp, hospitalSignIn} = require("../Controller/authController");
 const router  = express.Router();
 
 
 
-// router.route("/doctor/login").post();
+router.route("/hospital/signup").post(hospitalSignUp);
+router.route("/hospital/signin").post(hospitalSignIn);
 // router.route("/doctor/signup").post();
 
 router.route("/user/signin").post(userSignIn);

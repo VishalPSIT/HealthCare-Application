@@ -3,7 +3,7 @@ const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const {connectDb} = require("./config/database.js");
-const authRoute = require("./src/routes/authRoute.js")
+const authRoute = require("./src/routes/authRoutes.js")
 
 const {logData} = require("./src/middleware/log.js")
 //configuring env
