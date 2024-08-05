@@ -20,9 +20,8 @@ const addressSchema = new mongoose.Schema({
 
   zip_code: {
     type: String,
-    required: true,
+    required: true
   }
 });
 
-const Address = new mongoose.model('Address', addressSchema)
-module.exports = Address;
+module.exports = addressSchema;
