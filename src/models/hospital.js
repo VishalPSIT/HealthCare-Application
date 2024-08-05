@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt')
+const Address = require('./address.js')
 
 const hospitalSchema = new mongoose.Schema({
 
@@ -9,7 +11,7 @@ const hospitalSchema = new mongoose.Schema({
 
   email : {
     type : String,
-    required : true,
+    required : true
   },
 
   type: {
@@ -26,8 +28,7 @@ const hospitalSchema = new mongoose.Schema({
 
   address: {
     address_id : mongoose.Schema.Types.ObjectId,
-    ref: 'Address',
-    required: true
+    // ref: 'Address',
   },
 
   password : {
@@ -36,6 +37,10 @@ const hospitalSchema = new mongoose.Schema({
 }
 
 });
+
+hospitalSchema.method('comparePassword', async(password)=>{
+  return bcrypt.compare(password, this.password);
+})
 
 const Hospital = mongoose.model('Hospital', hospitalSchema);
 

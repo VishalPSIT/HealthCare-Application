@@ -1,7 +1,9 @@
-const {successResponse} = require("../utils/apiResponse.js");
+const {Response} = require("../utils/apiResponse.js");
 const user = require("../models/user.js");
 const Doctor = require("../models/doctor.js");
-const Hospital = require("../models/hospial.js")
+const Hospital = require("../models/hospital.js");
+const Address = require("../models/address.js");
+const bcrypt = require('bcrypt')
 
 
 
@@ -23,24 +25,24 @@ exports.userSignUp = async(req,res)=>{
                 
                 const newUser =await user.create({name , email , dateOfBirth , gender , phone});
                 const jsonObj = {success:true , message:"User Created"}
-                successResponse(req,res,200,jsonObj);
+                Response(req,res,200,jsonObj);
             }
             else{
                 const jsonObj = {success:false,message:"User already exists"}
-                successResponse(req,res,400,jsonObj);
+                Response(req,res,400,jsonObj);
             }
         }
         else{
             //data is missing
             const jsonObj = {success:false,message:"Data is missing"};
-            successResponse(req,res,400,jsonObj);
+            Response(req,res,400,jsonObj);
         }
         
 
     }
     catch(e){
         const jsonObj = {success:false , message:"Something went wrong at server"}
-        successResponse(req,res,400,jsonObj);
+        Response(req,res,400,jsonObj);
     }
 }
 
@@ -58,17 +60,17 @@ exports.userSignIn = async (req,res) =>{
             //oAuth implementation
 
             const jsonObj ={success:true , message:"User Signed in"}
-            successResponse(req,res,200,jsonObj);
+            Response(req,res,200,jsonObj);
         }
         else{
             const jsonObj ={success:false , message:"No user exists"}
-            successResponse(req,res,400,jsonObj);
+            Response(req,res,400,jsonObj);
         }
     }
     catch(e){
         console.log(e);
         const jsonObj = {success:false , message:"Something went Wrong at Server"}
-        successResponse(req,res,400,jsonObj);
+        Response(req,res,400,jsonObj);
 
     }
 }
@@ -96,20 +98,20 @@ exports.userUpdateProfile = async (req, res) => {
                 await existingUser.save();
 
                 const jsonObj = { success: true, message: "User profile updated successfully" };
-                successResponse(req, res, 200, jsonObj);
+                Response(req, res, 200, jsonObj);
             } else {
                 const jsonObj = { success: false, message: "User not found" };
-                successResponse(req, res, 404, jsonObj);
+                Response(req, res, 404, jsonObj);
             }
         } else {
             // Data is missing or invalid
             const jsonObj = { success: false, message: "Required data is missing or invalid" };
-            successResponse(req, res, 400, jsonObj);
+            Response(req, res, 400, jsonObj);
         }
     } catch (e) {
         console.log(e);
         const jsonObj = { success: false, message: "Something went wrong at the server" };
-        successResponse(req, res, 500, jsonObj);
+        Response(req, res, 500, jsonObj);
     }
 };
 
@@ -128,59 +130,45 @@ exports.hospitalSignUp = async(req,res)=>{
 
             //check Hospital existance
             const existingHospital =await Hospital.findOne({email});
-            console.log("existing user is " + existingHospital);
+            console.log("existing user is",existingHospital);
             if (!existingHospital){
+
+                //craete address
+                console.log("making adrress with",address)
+                const addr = await Address.findOne(address) || await Address.create(address)
+                console.log(" adrress = ",addr)
+                const addrId = addr._id
+                console.log(addrId)
                 //create Hospital
-                
-                const newHospital =await Hospital.create({hospital_name , email , type , beds_available , address , password});
+                const hashedPassword = await bcrypt.hash(password, 10)
+                const hospital =await Hospital.create({
+                    hospital_name , 
+                    email , type , 
+                    beds_available , 
+                    addrId , 
+                    password : hashedPassword
+                });
+                console.log("Hospital created = ",hospital)
                 const jsonObj = {success:true , message:"Hospital Created"}
-                successResponse(req,res,200,jsonObj);
+                Response(req,res,200,jsonObj);
 
             }
             else{
-                const jsonObj = {success:false,message:"User already exists"}
-                successResponse(req,res,400,jsonObj);
+                const jsonObj = {success:false,message:"Hospital already exists"}
+                Response(req,res,400,jsonObj);
             }
         }
         else{
             //data is missing
             const jsonObj = {success:false,message:"Data is missing"};
-            successResponse(req,res,400,jsonObj);
+            Response(req,res,400,jsonObj);
         }
         
 
     }
     catch(e){
+        console.log(e)
         const jsonObj = {success:false , message:"Something went wrong at server"}
-        successResponse(req,res,400,jsonObj);
-    }
-}
-
-
-
-
-exports.userSignIn = async (req,res) =>{
-    //req->email
-    try{
-        const {email} = req.body;
-        //validate email ->  pending
-
-        const existingUser = await user.findOne({email});
-        if (existingUser){
-            //oAuth implementation
-
-            const jsonObj ={success:true , message:"User Signed in"}
-            successResponse(req,res,200,jsonObj);
-        }
-        else{
-            const jsonObj ={success:false , message:"No user exists"}
-            successResponse(req,res,400,jsonObj);
-        }
-    }
-    catch(e){
-        console.log(e);
-        const jsonObj = {success:false , message:"Something went Wrong at Server"}
-        successResponse(req,res,400,jsonObj);
-
+        Response(req,res,400,jsonObj);
     }
 }

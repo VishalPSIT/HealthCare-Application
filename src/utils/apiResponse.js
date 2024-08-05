@@ -1,3 +1,3 @@
-exports.response = (req,res,statusCode,jsonObject) => {
-    return res.statusCode(statusCode).json(jsonObject)
+exports.Response = (req,res,statusCode,jsonObject) => {
+    return res.status(statusCode).json(jsonObject)
 }
