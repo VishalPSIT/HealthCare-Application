@@ -38,9 +38,9 @@ const hospitalSchema = new mongoose.Schema({
 
 });
 
-hospitalSchema.method('comparePassword', async(password)=>{
-  return bcrypt.compare(password, this.password);
-})
+hospitalSchema.methods.comparePassword = async function (password) {
+  return await bcrypt.compare(password, this.password);
+}
 
 const Hospital = mongoose.model('Hospital', hospitalSchema);
 

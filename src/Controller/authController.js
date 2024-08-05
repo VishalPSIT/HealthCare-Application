@@ -133,22 +133,21 @@ exports.hospitalSignUp = async(req,res)=>{
             console.log("existing user is",existingHospital);
             if (!existingHospital){
 
-                //craete address
-                console.log("making adrress with",address)
+                //get or create address
                 const addr = await Address.findOne(address) || await Address.create(address)
-                console.log(" adrress = ",addr)
                 const addrId = addr._id
-                console.log(addrId)
-                //create Hospital
+
+                //Hashing password
                 const hashedPassword = await bcrypt.hash(password, 10)
-                const hospital =await Hospital.create({
+
+                //create Hospital
+                const hospital = await Hospital.create({
                     hospital_name , 
                     email , type , 
                     beds_available , 
                     addrId , 
                     password : hashedPassword
                 });
-                console.log("Hospital created = ",hospital)
                 const jsonObj = {success:true , message:"Hospital Created"}
                 Response(req,res,200,jsonObj);
 
@@ -158,9 +157,8 @@ exports.hospitalSignUp = async(req,res)=>{
                 Response(req,res,400,jsonObj);
             }
         }
-        else{
+        else {
             //data is missing
-            const jsonObj = {success:false,message:"Data is missing"};
             Response(req,res,400,jsonObj);
         }
         
@@ -170,5 +168,60 @@ exports.hospitalSignUp = async(req,res)=>{
         console.log(e)
         const jsonObj = {success:false , message:"Something went wrong at server"}
         Response(req,res,400,jsonObj);
+    }
+}
+
+
+
+
+exports.hospitalSignIn = async(req, res) =>{
+
+    try {
+        const {email, password} = req.body
+
+        if (email && password) {
+
+            const existingHospital = await Hospital.findOne({email})
+            if (existingHospital) {
+                //compare password with stored hashed Password.
+                if (await existingHospital.comparePassword(password))
+                {
+                    const jsonObject = {
+                        success : true,
+                        message : "Hospital Logged In"
+                    }
+                    
+                    Response(req, res, 200, jsonObject)
+                }
+                else {
+                    const jsonObject = {
+                        success : false,
+                        message : "Paasword didn't matched"
+                    }
+                    Response(req, res, 400, jsonObject)
+                }
+            }
+            else {
+                const jsonObject = {
+                    success : false,
+                    message : "No Hospital with this email"
+                }
+                Response(req, res, 400, jsonObject)
+            }
+        }
+        else {
+            const jsonObject = {
+                success : false,
+                message : "Data is Missing"
+            }
+            Response(req, res, 400, jsonObject)
+        }
+    }
+    catch(e) {
+        const jsonObject = {
+            success : false,
+            message : 'Something went wrong at Server.'
+        }
+        Response(req, res, 400, jsonObject)
     }
 }
