@@ -97,16 +97,19 @@ exports.userUpdateProfile = async (req, res) => {
 
                 const jsonObj = { success: true, message: "User profile updated successfully" };
                 successResponse(req, res, 200, jsonObj);
-            } else {
+            } 
+            else {
                 const jsonObj = { success: false, message: "User not found" };
                 successResponse(req, res, 404, jsonObj);
             }
-        } else {
+        } 
+        else {
             // Data is missing or invalid
             const jsonObj = { success: false, message: "Required data is missing or invalid" };
             successResponse(req, res, 400, jsonObj);
         }
-    } catch (e) {
+    } 
+    catch (e) {
         console.log(e);
         const jsonObj = { success: false, message: "Something went wrong at the server" };
         successResponse(req, res, 500, jsonObj);
