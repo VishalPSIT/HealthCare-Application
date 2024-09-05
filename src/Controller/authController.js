@@ -1,29 +1,29 @@
 const {Response} = require("../utils/apiResponse.js");
-const user = require("../models/user.js");
+const User = require("../models/user.js");
 const Doctor = require("../models/doctor.js");
 const Hospital = require("../models/hospital.js");
 const Address = require("../models/address.js");
 const bcrypt = require('bcrypt')
 
 
-
 exports.userSignUp = async(req,res)=>{
     try{
         //get user details
         const {name , email , dateOfBirth , gender , phone} = req.body;
-
         //validate user details 
         if (name && email && dateOfBirth && gender && phone){
             //validation success ->pending
-
-
             //check user existance
-            const existingUser =await user.findOne({email});
-            console.log("existing user is "+existingUser);
+            const existingUser =await User.findOne({email});
             if (!existingUser){
                 //create user
                 
-                const newUser =await user.create({name , email , dateOfBirth , gender , phone});
+                const newUser =await User.create({name , email ,dateOfBirth : new Date(dateOfBirth), gender , phone});
+                const {userAccessToken , userRefreshToken} = await newUser.generateToken();
+                res.cookie('userAccessToken', userAccessToken, {maxAge:process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly:true})
+                res.cookie('userRefreshToken', userRefreshToken, {maxAge:process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly:true})
+
+
                 const jsonObj = {success:true , message:"User Created"}
                 Response(req,res,200,jsonObj);
             }
@@ -41,6 +41,7 @@ exports.userSignUp = async(req,res)=>{
 
     }
     catch(e){
+        console.log(e)
         const jsonObj = {success:false , message:"Something went wrong at server"}
         Response(req,res,400,jsonObj);
     }
@@ -55,12 +56,18 @@ exports.userSignIn = async (req,res) =>{
         const {email} = req.body;
         //validate email ->  pending
 
-        const existingUser = await user.findOne({email});
+        const existingUser = await User.findOne({email});
+
         if (existingUser){
             //oAuth implementation
 
+            const {userAccessToken , userRefreshToken} = await existingUser.generateToken();
+
+            res.cookie('userAccessToken',userAccessToken , {maxAge: process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly:true})
+            res.cookie('userRefreshToken',userRefreshToken, {maxAge: process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly:true})
             const jsonObj ={success:true , message:"User Signed in"}
             Response(req,res,200,jsonObj);
+
         }
         else{
             const jsonObj ={success:false , message:"No user exists"}
@@ -241,4 +248,7 @@ exports.hospitalSignIn = async(req, res) =>{
 
 exports.dummy = async (req, res) =>{
     return res.status(200).json({success : true, 'hospital' : req.hospital, message : "Authenticated to use service"})
+}
+exports.dummyUser = async (req, res) =>{
+    return res.status(200).json({success : true, 'user' : req.user, message : "Authenticated to use service"})
 }
