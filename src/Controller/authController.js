@@ -130,7 +130,7 @@ exports.hospitalSignUp = async(req,res)=>{
 
             //check Hospital existance
             const existingHospital =await Hospital.findOne({email});
-            console.log("existing user is",existingHospital);
+            // console.log("existing user is",existingHospital);
             if (!existingHospital){
 
                 //get or create address
@@ -148,6 +148,11 @@ exports.hospitalSignUp = async(req,res)=>{
                     addrId , 
                     password : hashedPassword
                 });
+                // generate token.
+                const {hospitalAccessToken, hospitalRefreshToken} = await existingHospital.generateToken()
+                res.cookie('hospitalAccessToken', hospitalAccessToken, {maxAge:process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly:true})
+                res.cookie('hospitalRefreshToken', hospitalRefreshToken, {maxAge:process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly:true})
+            
                 const jsonObj = {success:true , message:"Hospital Created"}
                 Response(req,res,200,jsonObj);
 
@@ -159,6 +164,7 @@ exports.hospitalSignUp = async(req,res)=>{
         }
         else {
             //data is missing
+            const jsonObj = {success:false,message:"Insuffcient data"}
             Response(req,res,400,jsonObj);
         }
         
@@ -186,6 +192,11 @@ exports.hospitalSignIn = async(req, res) =>{
                 //compare password with stored hashed Password.
                 if (await existingHospital.comparePassword(password))
                 {
+                    // generate token.
+                    const {hospitalAccessToken, hospitalRefreshToken} = await existingHospital.generateToken()
+                    res.cookie('hospitalAccessToken', hospitalAccessToken, {maxAge:process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly:true})
+                    res.cookie('hospitalRefreshToken', hospitalRefreshToken, {maxAge:process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly:true})
+                
                     const jsonObject = {
                         success : true,
                         message : "Hospital Logged In"
@@ -224,4 +235,10 @@ exports.hospitalSignIn = async(req, res) =>{
         }
         Response(req, res, 400, jsonObject)
     }
+}
+
+
+
+exports.dummy = async (req, res) =>{
+    return res.status(200).json({success : true, 'hospital' : req.hospital, message : "Authenticated to use service"})
 }
