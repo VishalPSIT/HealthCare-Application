@@ -32,8 +32,16 @@ discharge-and-free-bed
 get-appointment
 generate-receipt
 
-doctor-sign-up
+
 doctor-sign-in
+
+
+//complete profile also need to be done via a link whenever a doctor is added by a hospital.
+//so do we require to make a seperate route the profile comletion as everything is added by the hospital for the doctor.
+// the only thing is he only need to verify himself that yes he is the one who is working there and also somehow the mapping of
+the hospital and doctor required which is not mentioned int the models .... according to that models need to be corrected/updateed
+
+
 upload-qualification
 update-doctor-details
 request-schedule-delete

@@ -4,7 +4,7 @@ const Doctor = require("../models/doctor.js");
 const Hospital = require("../models/hospital.js");
 const Address = require("../models/address.js");
 const bcrypt = require('bcrypt')
-
+const {generatePassword} = require("../utils/passwordGenerator.js")
 
 exports.userSignUp = async(req,res)=>{
     try{
@@ -252,3 +252,40 @@ exports.dummy = async (req, res) =>{
 exports.dummyUser = async (req, res) =>{
     return res.status(200).json({success : true, 'user' : req.user, message : "Authenticated to use service"})
 }
+
+
+exports.addDoctor = async (req,res)=>{
+    try{
+        const {doctor_name,specialty,email,phone,gender,UID,qualification,qualification_url}= req.body;
+        const password = generatePassword();
+
+        console.log("password is ", password);
+
+        if(doctor_name && specialty && email && phone && password && gender && UID){
+
+            const existingDoctor = await Doctor.findOne({email});
+            if(!existingDoctor){
+
+                const hashedPassword = await bcrypt.hash(password, 10)
+                const newDoctor = await Doctor.create({doctor_name,specialty,email,phone,password : hashedPassword,gender,UID,qualification,qualification_url});
+
+
+                const jsonObj = {success:true , message:"Doctor enrolled"}
+                Response(req,res,200,jsonObj);
+            }else{
+                const jsonObj = {success:false,message:"Doctor already registered"}
+                Response(req,res,400,jsonObj);
+            }
+        }else{
+            const jsonObj = {success:false,message:"Data is missing in Doctor field"};
+            Response(req,res,400,jsonObj);
+        }
+    }catch(e){
+        console.log(e)
+        const jsonObj = {success:false , message:"Something went wrong at server"}
+        Response(req,res,400,jsonObj);
+    }
+}
+
+
+
