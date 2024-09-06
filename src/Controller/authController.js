@@ -1,10 +1,11 @@
+
 const {Response} = require("../utils/apiResponse.js");
 const User = require("../models/user.js");
 const Doctor = require("../models/doctor.js");
 const Hospital = require("../models/hospital.js");
 const Address = require("../models/address.js");
 const bcrypt = require('bcrypt')
-const {generatePassword} = require("../utils/passwordGenerator.js")
+
 
 exports.userSignUp = async(req,res)=>{
     try{
@@ -254,12 +255,11 @@ exports.dummyUser = async (req, res) =>{
 }
 
 
-exports.addDoctor = async (req,res)=>{
+exports.doctorSignUp = async (req,res)=>{
     try{
-        const {doctor_name,specialty,email,phone,gender,UID,qualification,qualification_url}= req.body;
-        const password = generatePassword();
 
-        console.log("password is ", password);
+        const {doctor_name,specialty,email,phone,gender,password,UID} = req.body;
+    
 
         if(doctor_name && specialty && email && phone && password && gender && UID){
 
@@ -267,8 +267,12 @@ exports.addDoctor = async (req,res)=>{
             if(!existingDoctor){
 
                 const hashedPassword = await bcrypt.hash(password, 10)
-                const newDoctor = await Doctor.create({doctor_name,specialty,email,phone,password : hashedPassword,gender,UID,qualification,qualification_url});
+                const newDoctor = await Doctor.create({doctor_name,specialty,email,phone,password : hashedPassword,gender,UID});
 
+                const {doctorAccessToken , doctorRefreshToken} = await newDoctor.generateToken();
+
+                res.cookie('doctorAccessToken' , doctorAccessToken , {maxAge : process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly: true})
+                res.cookie('doctorRefreshToken' , doctorRefreshToken , {maxAge : process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly: true})
 
                 const jsonObj = {success:true , message:"Doctor enrolled"}
                 Response(req,res,200,jsonObj);

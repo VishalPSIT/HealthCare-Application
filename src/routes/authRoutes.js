@@ -1,5 +1,5 @@
 const express = require("express");
-const {userSignUp, userSignIn, userUpdateProfile, hospitalSignUp, hospitalSignIn, dummy , dummyUser, addDoctor} = require("../Controller/authController");
+const {userSignUp, userSignIn, userUpdateProfile, hospitalSignUp, hospitalSignIn, dummy , dummyUser, doctorSignUp} = require("../Controller/authController");
 const { hospitalIsAuthenticated , userIsAuthenticated} = require("../middleware/auth");
 const router  = express.Router();
 
@@ -8,7 +8,7 @@ const router  = express.Router();
 router.route("/hospital/signup").post(hospitalSignUp);
 router.route("/hospital/signin").post(hospitalSignIn);
 // router.route("/doctor/signup").post();
-router.route("/hospital/add-doctor" ).post(addDoctor);
+router.route("/doctor/signup" ).post(doctorSignUp);
 
 
 router.route("/user/signin").post(userSignIn);
