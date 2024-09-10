@@ -223,7 +223,7 @@ exports.dummyUser = async (req, res) =>{
 
 
 exports.dummyDoctor = async (req, res) =>{
-    return res.status(200).json({ message : "Yet to complete doctor Authentication"})
+    return res.status(200).json({success : true, doctor : req.doctor, message : "Authenticated to use service"})
 }
 
 
