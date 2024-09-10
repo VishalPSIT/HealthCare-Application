@@ -220,9 +220,13 @@ exports.dummyUser = async (req, res) =>{
     return res.status(200).json({success : true, 'user' : req.user, message : "Authenticated to use service"})
 }
 
+
+
 exports.dummyDoctor = async (req, res) =>{
     return res.status(200).json({ message : "Yet to complete doctor Authentication"})
 }
+
+
 
 exports.doctorSignUp = async (req,res)=>{
     try{
@@ -260,11 +264,90 @@ exports.doctorSignUp = async (req,res)=>{
     }
 }
 
+
+
 exports.doctorSignIn = async (req,res) => {
-    //write your logic for doctor dign in
-    return res.status(200).json({
-        message:"yet to complete"
-    })
+    try{
+
+        const {email , UID , password} = req.body;
+        if(email && UID && password){
+            
+            const existingDoctor = await Doctor.findOne({email , UID});
+
+            //if doctor is not registered then return response
+            if(!existingDoctor){
+                const jsonObject = {
+                    success: false,
+                    message : "Doctor is not register"
+                }
+                Response(req,res,500,jsonObject);
+            }
+
+            const match = await existingDoctor.comparePassword(password);
+            if(!match){
+                const jsonObject = {
+                    success :false,
+                    message : "Password Incorrect"
+                }
+                Response(req,res,400,jsonObject);
+            }
+            
+
+            if(existingDoctor.isProfileCompleted === false){
+
+                const jsonObject = {
+                    success : true,
+                    profileCompleted : isProfileCompleted,
+                    message : "Send him to complete profile route"
+                }
+                Response(req,res,200,jsonObject);
+
+            }
+
+            
+            if(existingDoctor.isVerified === false){
+                const jsonObject = {
+                    success : false,
+                    message : "Doctor is not Verified yet"
+                }
+                Response(req,res,400,jsonObject);
+            }
+            
+            
+
+            //create cookie
+            const {doctorAccessToken, doctorRefreshToken} = await existingDoctor.generateToken()
+            res.cookie('doctorAccessToken', doctorAccessToken, {maxAge:process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly:true})
+            res.cookie('doctorRefreshToken', doctorRefreshToken, {maxAge:process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly:true})
+            
+            const jsonObject = {
+                success : true,
+                doctor : existingDoctor,
+                message : "Doctor Logged in"
+            }
+            Response(req,res,200,jsonObject)
+
+        }else{
+            const jsonObject = {
+                success: false,
+                message : "Enter valid email & UID"
+            }
+            Response(req,res,400,jsonObject);
+        }
+    }catch(e){
+        const jsonObject = {
+            success : false, 
+            message : "Something went wrong at Server end"
+        }
+        console.log(e);
+        Response(req,res,500,jsonObject);
+    }
+
+
+    // //write your logic for doctor dign in
+    // return res.status(200).json({
+    //     message:"yet to complete"
+    // })
 }
 
 
