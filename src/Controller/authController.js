@@ -1,3 +1,4 @@
+
 const {Response} = require("../utils/apiResponse.js");
 const User = require("../models/user.js");
 const Doctor = require("../models/doctor.js");
@@ -84,43 +85,7 @@ exports.userSignIn = async (req,res) =>{
 
 //----------------------------------------------04/08/2024-----------------------------------------------------
 
-exports.userUpdateProfile = async (req, res) => {
-    try {
-        // Get user details from request body
-        const { name, email, dateOfBirth, gender, phone } = req.body;
 
-        // Validate user details
-        if (email && (name || dateOfBirth || gender || phone)) {
-            // Check if user exists
-            const existingUser = await user.findOne({ email });
-
-            if (existingUser) {
-                // Update user details
-                if (name) existingUser.name = name;
-                if (dateOfBirth) existingUser.dateOfBirth = dateOfBirth;
-                if (gender) existingUser.gender = gender;
-                if (phone) existingUser.phone = phone;
-
-                // Save the updated user
-                await existingUser.save();
-
-                const jsonObj = { success: true, message: "User profile updated successfully" };
-                Response(req, res, 200, jsonObj);
-            } else {
-                const jsonObj = { success: false, message: "User not found" };
-                Response(req, res, 404, jsonObj);
-            }
-        } else {
-            // Data is missing or invalid
-            const jsonObj = { success: false, message: "Required data is missing or invalid" };
-            Response(req, res, 400, jsonObj);
-        }
-    } catch (e) {
-        console.log(e);
-        const jsonObj = { success: false, message: "Something went wrong at the server" };
-        Response(req, res, 500, jsonObj);
-    }
-};
 
 
 //-----------------------------------------------(Hospital Details) ---------------------------------------
@@ -249,6 +214,59 @@ exports.hospitalSignIn = async(req, res) =>{
 exports.dummy = async (req, res) =>{
     return res.status(200).json({success : true, 'hospital' : req.hospital, message : "Authenticated to use service"})
 }
+
+
 exports.dummyUser = async (req, res) =>{
     return res.status(200).json({success : true, 'user' : req.user, message : "Authenticated to use service"})
 }
+
+exports.dummyDoctor = async (req, res) =>{
+    return res.status(200).json({ message : "Yet to complete doctor Authentication"})
+}
+
+exports.doctorSignUp = async (req,res)=>{
+    try{
+
+        const {doctor_name,specialty,email,phone,gender,password,UID} = req.body;
+    
+
+        if(doctor_name && specialty && email && phone && password && gender && UID){
+
+            const existingDoctor = await Doctor.findOne({email,UID});
+            if(!existingDoctor){
+
+                const hashedPassword = await bcrypt.hash(password, 10)
+                const newDoctor = await Doctor.create({doctor_name,specialty,email,phone,password : hashedPassword,gender,UID});
+
+                const {doctorAccessToken , doctorRefreshToken} = await newDoctor.generateToken();
+
+                res.cookie('doctorAccessToken' , doctorAccessToken , {maxAge : process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly: true})
+                res.cookie('doctorRefreshToken' , doctorRefreshToken , {maxAge : process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly: true})
+
+                const jsonObj = {success:true , message:"Doctor enrolled"}
+                Response(req,res,200,jsonObj);
+            }else{
+                const jsonObj = {success:false,message:"Doctor already registered"}
+                Response(req,res,400,jsonObj);
+            }
+        }else{
+            const jsonObj = {success:false,message:"Data is missing in Doctor field"};
+            Response(req,res,400,jsonObj);
+        }
+    }catch(e){
+        console.log(e)
+        const jsonObj = {success:false , message:"Something went wrong at server"}
+        Response(req,res,400,jsonObj);
+    }
+}
+
+exports.doctorSignIn = async (req,res) => {
+    //write your logic for doctor dign in
+    return res.status(200).json({
+        message:"yet to complete"
+    })
+}
+
+
+
+
