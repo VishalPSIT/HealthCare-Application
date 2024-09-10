@@ -74,7 +74,7 @@ const doctorSchema = new mongoose.Schema({
 
 
 doctorSchema.methods.generateToken = async function () {
-    const doctorAccessToken = jwt.sign({user : this}, process.env.ACCESS_TOKEN_SECRET, {expiresIn : process.env.ACCESS_TOKEN_EXPIRY})
+    const doctorAccessToken = jwt.sign({doctor : this}, process.env.ACCESS_TOKEN_SECRET, {expiresIn : process.env.ACCESS_TOKEN_EXPIRY})
     const doctorRefreshToken = jwt.sign({id : this._id}, process.env.REFRESH_TOKEN_SECRET, {expiresIn : process.env.REFRESH_TOKEN_EXPIRY})
     this.refreshToken = doctorRefreshToken
     await this.save()
