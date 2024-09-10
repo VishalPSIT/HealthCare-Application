@@ -132,3 +132,11 @@ exports.userIsAuthenticated = async(req, res ,next)=>{
 
 
 }
+
+
+exports.doctorIsAuthenticated = async (req , res , next) => {
+    
+    console.log("complete middleware doctorIsAuthencated")
+    next();
+
+}
