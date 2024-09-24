@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const jwt = require("jsonwebtoken")
 const userSchema = new mongoose.Schema({
 
     name:{
@@ -27,9 +27,24 @@ const userSchema = new mongoose.Schema({
     phone : {
         type : String,
         required : false
+    },
+    
+    refreshToken : {
+        type : String
     }
 
+
 })
+
+userSchema.methods.generateToken = async function () {
+    const userAccessToken = jwt.sign({user : this}, process.env.ACCESS_TOKEN_SECRET, {expiresIn : process.env.ACCESS_TOKEN_EXPIRY})
+    const userRefreshToken = jwt.sign({id : this._id}, process.env.REFRESH_TOKEN_SECRET, {expiresIn : process.env.REFRESH_TOKEN_EXPIRY})
+
+    this.refreshToken = userRefreshToken
+    await this.save()
+    return {userAccessToken, userRefreshToken}
+  }
+
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;

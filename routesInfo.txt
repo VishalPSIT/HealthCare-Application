@@ -32,7 +32,7 @@ discharge-and-free-bed
 get-appointment
 generate-receipt
 
-doctor-sign-up
+doctor-sign-up      
 doctor-sign-in
 upload-qualification
 update-doctor-details
@@ -40,3 +40,41 @@ request-schedule-delete
 verify-add-schedule
 get-appointment
 
+router.route("/user/update-profile").put(userUpdateProfile)
+exports.userUpdateProfile = async (req, res) => {
+    try {
+        // Get user details from request body
+        const { name, email, dateOfBirth, gender, phone } = req.body;
+
+        // Validate user details
+        if (email && (name || dateOfBirth || gender || phone)) {
+            // Check if user exists
+            const existingUser = await user.findOne({ email });
+
+            if (existingUser) {
+                // Update user details
+                if (name) existingUser.name = name;
+                if (dateOfBirth) existingUser.dateOfBirth = dateOfBirth;
+                if (gender) existingUser.gender = gender;
+                if (phone) existingUser.phone = phone;
+
+                // Save the updated user
+                await existingUser.save();
+
+                const jsonObj = { success: true, message: "User profile updated successfully" };
+                Response(req, res, 200, jsonObj);
+            } else {
+                const jsonObj = { success: false, message: "User not found" };
+                Response(req, res, 404, jsonObj);
+            }
+        } else {
+            // Data is missing or invalid
+            const jsonObj = { success: false, message: "Required data is missing or invalid" };
+            Response(req, res, 400, jsonObj);
+        }
+    } catch (e) {
+        console.log(e);
+        const jsonObj = { success: false, message: "Something went wrong at the server" };
+        Response(req, res, 500, jsonObj);
+    }
+};

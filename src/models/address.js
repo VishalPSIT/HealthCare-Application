@@ -20,7 +20,7 @@ const addressSchema = new mongoose.Schema({
 
   zip_code: {
     type: String,
-    required: true,
+    required: true
   }
 });
 

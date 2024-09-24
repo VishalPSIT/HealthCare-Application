@@ -3,7 +3,8 @@ const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const {connectDb} = require("./config/database.js");
-const authRoute = require("./src/routes/authRoute.js")
+const authRoute = require("./src/routes/authRoutes.js")
+const doctorRoutes = require("./src/routes/doctorRoutes.js")
 
 const {logData} = require("./src/middleware/log.js")
 //configuring env
@@ -25,6 +26,7 @@ app.use(logData);
 
 //routes
 app.use("/auth",authRoute);
+app.use("/doctor",doctorRoutes);
 
 
 //connecting database.
