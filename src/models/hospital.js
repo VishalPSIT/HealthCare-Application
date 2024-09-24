@@ -1,19 +1,19 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt')
-const Address = require('./address.js')
 const jwt = require('jsonwebtoken')
 
 
 const hospitalSchema = new mongoose.Schema({
 
-  hospital_name: {
+  hospitalName: {
     type: String,
     required: true
   },
 
   email : {
     type : String,
-    required : true
+    required : true,
+    unique : true
   },
 
   type: {
@@ -22,15 +22,17 @@ const hospitalSchema = new mongoose.Schema({
     enum: ['hospital', 'clinic']
   },
 
-  beds_available: {
+  bedsAvailable: {
     type: Number,
     required: false,
     default : 0
   },
 
   address: {
-    address_id : mongoose.Schema.Types.ObjectId,
-    // ref: 'Address',
+    addressLine1 : { type : String, required : true },
+    city : { type : String, required : true },
+    state : { type : String, required : true },
+    zipCode : { type : String, required : true }
   },
 
   password : {

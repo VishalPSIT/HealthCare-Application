@@ -21,7 +21,6 @@ Hospital-sign-in
 Hospital-sign-up
 update-hospital-details
 increase-bed-strength
-add-doctor
 request-add-schedule
 delete-schedule
 request-update-schedule

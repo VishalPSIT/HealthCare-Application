@@ -3,7 +3,6 @@ const {Response} = require("../utils/apiResponse.js");
 const User = require("../models/user.js");
 const Doctor = require("../models/doctor.js");
 const Hospital = require("../models/hospital.js");
-const Address = require("../models/address.js");
 const bcrypt = require('bcrypt')
 
 
@@ -26,17 +25,17 @@ exports.userSignUp = async(req,res)=>{
 
 
                 const jsonObj = {success:true , message:"User Created"}
-                Response(req,res,200,jsonObj);
+                return Response(req,res,200,jsonObj);
             }
             else{
                 const jsonObj = {success:false,message:"User already exists"}
-                Response(req,res,400,jsonObj);
+                return Response(req,res,400,jsonObj);
             }
         }
         else{
             //data is missing
             const jsonObj = {success:false,message:"Data is missing"};
-            Response(req,res,400,jsonObj);
+            return Response(req,res,400,jsonObj);
         }
         
 
@@ -44,7 +43,7 @@ exports.userSignUp = async(req,res)=>{
     catch(e){
         console.log(e)
         const jsonObj = {success:false , message:"Something went wrong at server"}
-        Response(req,res,400,jsonObj);
+        return Response(req,res,400,jsonObj);
     }
 }
 
@@ -67,18 +66,18 @@ exports.userSignIn = async (req,res) =>{
             res.cookie('userAccessToken',userAccessToken , {maxAge: process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly:true})
             res.cookie('userRefreshToken',userRefreshToken, {maxAge: process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly:true})
             const jsonObj ={success:true , message:"User Signed in"}
-            Response(req,res,200,jsonObj);
+            return Response(req,res,200,jsonObj);
 
         }
         else{
             const jsonObj ={success:false , message:"No user exists"}
-            Response(req,res,400,jsonObj);
+            return Response(req,res,400,jsonObj);
         }
     }
     catch(e){
         console.log(e);
         const jsonObj = {success:false , message:"Something went Wrong at Server"}
-        Response(req,res,400,jsonObj);
+        return Response(req,res,400,jsonObj);
 
     }
 }
@@ -93,51 +92,49 @@ exports.userSignIn = async (req,res) =>{
 exports.hospitalSignUp = async(req,res)=>{
     try{
         //get user details
-        const {hospital_name , email , type , beds_available , address , password} = req.body;
+        const {hospitalName , email , type , bedsAvailable , address , password} = req.body;
 
         //validate user details 
-        if (hospital_name && email && type && beds_available && address && password){
+        if (hospitalName && email && type && bedsAvailable && address && password){
             //validation success ->pending
 
 
             //check Hospital existance
             const existingHospital =await Hospital.findOne({email});
             // console.log("existing user is",existingHospital);
-            if (!existingHospital){
 
-                //get or create address
-                const addr = await Address.findOne(address) || await Address.create(address)
-                const addrId = addr._id
+            if (!existingHospital){
 
                 //Hashing password
                 const hashedPassword = await bcrypt.hash(password, 10)
 
                 //create Hospital
                 const hospital = await Hospital.create({
-                    hospital_name , 
+                    hospitalName , 
                     email , type , 
-                    beds_available , 
-                    addrId , 
+                    bedsAvailable , 
+                    address, 
                     password : hashedPassword
                 });
+
                 // generate token.
-                const {hospitalAccessToken, hospitalRefreshToken} = await existingHospital.generateToken()
+                const {hospitalAccessToken, hospitalRefreshToken} = await hospital.generateToken()
                 res.cookie('hospitalAccessToken', hospitalAccessToken, {maxAge:process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly:true})
                 res.cookie('hospitalRefreshToken', hospitalRefreshToken, {maxAge:process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly:true})
             
                 const jsonObj = {success:true , message:"Hospital Created"}
-                Response(req,res,200,jsonObj);
+                return Response(req,res,200,jsonObj);
 
             }
             else{
                 const jsonObj = {success:false,message:"Hospital already exists"}
-                Response(req,res,400,jsonObj);
+                return Response(req,res,400,jsonObj);
             }
         }
         else {
             //data is missing
             const jsonObj = {success:false,message:"Insuffcient data"}
-            Response(req,res,400,jsonObj);
+            return Response(req,res,400,jsonObj);
         }
         
 
@@ -145,7 +142,7 @@ exports.hospitalSignUp = async(req,res)=>{
     catch(e){
         console.log(e)
         const jsonObj = {success:false , message:"Something went wrong at server"}
-        Response(req,res,400,jsonObj);
+        return Response(req,res,400,jsonObj);
     }
 }
 
@@ -174,14 +171,14 @@ exports.hospitalSignIn = async(req, res) =>{
                         message : "Hospital Logged In"
                     }
                     
-                    Response(req, res, 200, jsonObject)
+                    return Response(req, res, 200, jsonObject)
                 }
                 else {
                     const jsonObject = {
                         success : false,
                         message : "Paasword didn't matched"
                     }
-                    Response(req, res, 400, jsonObject)
+                    return Response(req, res, 400, jsonObject)
                 }
             }
             else {
@@ -189,7 +186,7 @@ exports.hospitalSignIn = async(req, res) =>{
                     success : false,
                     message : "No Hospital with this email"
                 }
-                Response(req, res, 400, jsonObject)
+                return Response(req, res, 400, jsonObject)
             }
         }
         else {
@@ -197,15 +194,16 @@ exports.hospitalSignIn = async(req, res) =>{
                 success : false,
                 message : "Data is Missing"
             }
-            Response(req, res, 400, jsonObject)
+            return Response(req, res, 400, jsonObject)
         }
     }
     catch(e) {
+        console.log(e)
         const jsonObject = {
             success : false,
             message : 'Something went wrong at Server.'
         }
-        Response(req, res, 400, jsonObject)
+        return Response(req, res, 400, jsonObject)
     }
 }
 
@@ -231,36 +229,46 @@ exports.dummyDoctor = async (req, res) =>{
 exports.doctorSignUp = async (req,res)=>{
     try{
 
-        const {doctor_name,specialty,email,phone,gender,password,UID} = req.body;
+        const {doctorName, specialty, email, phone, gender, password, UID, experience} = req.body;
     
+        //checking 
+        if(!(doctorName && specialty && email && phone && password && gender && UID)){
 
-        if(doctor_name && specialty && email && phone && password && gender && UID){
+            const jsonObj = {success:false,message:"Data is missing in Doctor field"};
+            return Response(req,res,400,jsonObj);
 
-            const existingDoctor = await Doctor.findOne({email,UID});
-            if(!existingDoctor){
+        }
 
+            const existingDoctor = await Doctor.findOne({ UID });
+
+            if( existingDoctor ){
+
+                const jsonObj = {success:false,message:"Doctor already registered"}
+                return Response(req,res,400,jsonObj);
+
+            }
+
+                //hashing Password.
                 const hashedPassword = await bcrypt.hash(password, 10)
-                const newDoctor = await Doctor.create({doctor_name,specialty,email,phone,password : hashedPassword,gender,UID});
 
+                //Creating Doctor
+                const newDoctor = await Doctor.create({ doctorName, specialty, email, phone, password : hashedPassword, gender, UID, experience });
+
+                //getting tokens
                 const {doctorAccessToken , doctorRefreshToken} = await newDoctor.generateToken();
 
+                //setting cookies
                 res.cookie('doctorAccessToken' , doctorAccessToken , {maxAge : process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly: true})
                 res.cookie('doctorRefreshToken' , doctorRefreshToken , {maxAge : process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly: true})
 
                 const jsonObj = {success:true , message:"Doctor enrolled"}
-                Response(req,res,200,jsonObj);
-            }else{
-                const jsonObj = {success:false,message:"Doctor already registered"}
-                Response(req,res,400,jsonObj);
-            }
-        }else{
-            const jsonObj = {success:false,message:"Data is missing in Doctor field"};
-            Response(req,res,400,jsonObj);
-        }
+                return Response(req,res,200,jsonObj);
+            
+        
     }catch(e){
         console.log(e)
         const jsonObj = {success:false , message:"Something went wrong at server"}
-        Response(req,res,400,jsonObj);
+        return Response(req,res,400,jsonObj);
     }
 }
 
@@ -269,10 +277,10 @@ exports.doctorSignUp = async (req,res)=>{
 exports.doctorSignIn = async (req,res) => {
     try{
 
-        const {email , UID , password} = req.body;
-        if(email && UID && password){
+        const { UID , password} = req.body;
+        if(UID && password){
             
-            const existingDoctor = await Doctor.findOne({email , UID});
+            const existingDoctor = await Doctor.findOne({ UID });
 
             //if doctor is not registered then return response
             if(!existingDoctor){
@@ -280,7 +288,7 @@ exports.doctorSignIn = async (req,res) => {
                     success: false,
                     message : "Doctor is not register"
                 }
-                Response(req,res,500,jsonObject);
+                return Response(req,res,500,jsonObject);
             }
 
             const match = await existingDoctor.comparePassword(password);
@@ -289,50 +297,28 @@ exports.doctorSignIn = async (req,res) => {
                     success :false,
                     message : "Password Incorrect"
                 }
-                Response(req,res,400,jsonObject);
+                return Response(req,res,400,jsonObject);
             }
             
-
-            if(existingDoctor.isProfileCompleted === false){
-
-                const jsonObject = {
-                    success : true,
-                    profileCompleted : isProfileCompleted,
-                    message : "Send him to complete profile route"
-                }
-                Response(req,res,200,jsonObject);
-
-            }
-
-            
-            if(existingDoctor.isVerified === false){
-                const jsonObject = {
-                    success : false,
-                    message : "Doctor is not Verified yet"
-                }
-                Response(req,res,400,jsonObject);
-            }
-            
-            
-
             //create cookie
             const {doctorAccessToken, doctorRefreshToken} = await existingDoctor.generateToken()
             res.cookie('doctorAccessToken', doctorAccessToken, {maxAge:process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly:true})
             res.cookie('doctorRefreshToken', doctorRefreshToken, {maxAge:process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly:true})
+            
             
             const jsonObject = {
                 success : true,
                 doctor : existingDoctor,
                 message : "Doctor Logged in"
             }
-            Response(req,res,200,jsonObject)
+            return Response(req,res,200,jsonObject)
 
         }else{
             const jsonObject = {
                 success: false,
                 message : "Enter valid email & UID"
             }
-            Response(req,res,400,jsonObject);
+            return Response(req,res,400,jsonObject);
         }
     }catch(e){
         const jsonObject = {
@@ -340,7 +326,7 @@ exports.doctorSignIn = async (req,res) => {
             message : "Something went wrong at Server end"
         }
         console.log(e);
-        Response(req,res,500,jsonObject);
+        return Response(req,res,500,jsonObject);
     }
 
 
