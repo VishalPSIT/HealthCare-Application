@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const doctorSchema = new mongoose.Schema({
 
-    doctor_name: {
+    doctorName: {
         type: String,
         required: true
     },
@@ -44,15 +44,10 @@ const doctorSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-
-    qualification_url : {
-        type : String,
-        required : false
-    },
-
+    
     experience: {
         type: Number,
-        required: false
+        default : 0
     },
 
     isProfileCompleted : {
@@ -77,6 +72,8 @@ const doctorSchema = new mongoose.Schema({
 doctorSchema.methods.comparePassword = async function (password) {
     return await bcrypt.compare(password, this.password);
   }
+
+  
 doctorSchema.methods.generateToken = async function () {
     const doctorAccessToken = jwt.sign({doctor : this}, process.env.ACCESS_TOKEN_SECRET, {expiresIn : process.env.ACCESS_TOKEN_EXPIRY})
     const doctorRefreshToken = jwt.sign({id : this._id}, process.env.REFRESH_TOKEN_SECRET, {expiresIn : process.env.REFRESH_TOKEN_EXPIRY})

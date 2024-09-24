@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const scheduleSchema = new mongoose.Schema({
+const pendingScheduleSchema = new mongoose.Schema({
 
   day : {
     type: String ,
@@ -37,24 +37,28 @@ const scheduleSchema = new mongoose.Schema({
       zipCode : { type : String, required : true } 
     },
   },
-  
+
   appointmentLimit: {
     type: Number,
     required: true
   },
 
-  appointmentDone : {
-    type : Number,
-    default : 0
-  },
+  fees : { type : Number, required : true },
 
-  fees : {
-    type : Number,
-    required : true
-  }
+  isUpdate : { type : Boolean, required : true, default : false },
+
+  isAdd : {type : Boolean, required : true, default : false },
+
+  isDelete : { type : Boolean, required : true, default : false },
+
+  consentByDoctor : { type : Boolean, required : true, default : false },
+  
+  consentByHospital : { type : Boolean, required : true, default : false },
+
+  scheduleId : { type : mongoose.Schema.Types.ObjectId, default : null }
 
 });
 
-const Schedule = mongoose.model('Schedule', scheduleSchema);
+const PendingSchedule = mongoose.model('PendingSchedule', pendingScheduleSchema);
 
-module.exports = Schedule;
+module.exports = PendingSchedule;

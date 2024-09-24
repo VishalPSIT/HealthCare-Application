@@ -17,7 +17,7 @@ exports.hospitalIsAuthenticated = async(req, res ,next)=>{
                 success : false,
                 message : "No token provided."
             }
-            Response(req, res, 400, jsonObject)
+            return Response(req, res, 400, jsonObject)
 
         }
 
@@ -37,7 +37,7 @@ exports.hospitalIsAuthenticated = async(req, res ,next)=>{
                     success : false,
                     message : "Wrong Data in refreshToken"
                 }
-                Response(req, res, 400, jsonObject)
+                return Response(req, res, 400, jsonObject)
             }
             if (hospital.refreshToken !== cookieRefreshToken)
             {
@@ -45,11 +45,9 @@ exports.hospitalIsAuthenticated = async(req, res ,next)=>{
                     success : false,
                     message : "RefreshToken Didn't matched."
                 }
-                Response(req, res, 400, jsonObject)
+                return Response(req, res, 400, jsonObject)
             }
             const {hospitalAccessToken, hospitalRefreshToken} = await hospital.generateToken()
-            console.log("new accessToken  : ",hospitalAccessToken)
-            console.log("\nnew refreshToken  : ",hospitalRefreshToken)
             
             res.cookie('hospitalAccessToken', hospitalAccessToken, {maxAge:process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly:true})
             res.cookie('hospitalRefreshToken', hospitalRefreshToken, {maxAge:process.env.COOKIE_EXPIRY*24*60*60*1000 , httpOnly:true})
@@ -58,12 +56,11 @@ exports.hospitalIsAuthenticated = async(req, res ,next)=>{
         next()
     } 
     catch (error) {
-        console.log(error)
         const jsonObject = {
             success : false,
             message : error.message
         }
-        Response(req, res, 400, jsonObject)
+        return Response(req, res, 400, jsonObject)
         
     }
 
@@ -82,7 +79,7 @@ exports.userIsAuthenticated = async(req, res ,next)=>{
                 success : false,
                 message : "No token provided."
             }
-            Response(req, res, 400, jsonObject)
+            return Response(req, res, 400, jsonObject)
 
         }
 
@@ -102,7 +99,7 @@ exports.userIsAuthenticated = async(req, res ,next)=>{
                     success : false,
                     message : "Wrong Data in refreshToken"
                 }
-                Response(req, res, 400, jsonObject)
+                return Response(req, res, 400, jsonObject)
             }
             if (user.refreshToken !== cookieRefreshToken)
             {
@@ -110,7 +107,7 @@ exports.userIsAuthenticated = async(req, res ,next)=>{
                     success : false,
                     message : "RefreshToken Didn't matched."
                 }
-                Response(req, res, 400, jsonObject)
+                return Response(req, res, 400, jsonObject)
             }
             const {userAccessToken, userRefreshToken} = await user.generateToken()
             
@@ -126,7 +123,7 @@ exports.userIsAuthenticated = async(req, res ,next)=>{
             success : false,
             message : error.message
         }
-        Response(req, res, 400, jsonObject)
+        return Response(req, res, 400, jsonObject)
         
     }
 }
@@ -144,14 +141,13 @@ exports.doctorIsAuthenticated = async (req , res , next) => {
                 success : false,
                 message : "No token provided."
             }
-            Response(req, res, 400, jsonObject)
+            return Response(req, res, 400, jsonObject)
 
         }
 
         else if(cookieAccessToken) 
         {
             const decodedToken = jwt.verify(cookieAccessToken, process.env.ACCESS_TOKEN_SECRET)
-            console.log(decodedToken.doctor)
             req.doctor = decodedToken.doctor
         }
 
@@ -165,7 +161,7 @@ exports.doctorIsAuthenticated = async (req , res , next) => {
                     success : false,
                     message : "Wrong Data in refreshToken"
                 }
-                Response(req, res, 400, jsonObject)
+                return Response(req, res, 400, jsonObject)
             }
             if (doctor.refreshToken !== cookieRefreshToken)
             {
@@ -173,7 +169,7 @@ exports.doctorIsAuthenticated = async (req , res , next) => {
                     success : false,
                     message : "RefreshToken Didn't matched."
                 }
-                Response(req, res, 400, jsonObject)
+                return Response(req, res, 400, jsonObject)
             }
             const {doctorAccessToken, doctorRefreshToken} = await doctor.generateToken()
             
@@ -189,7 +185,7 @@ exports.doctorIsAuthenticated = async (req , res , next) => {
             success : false,
             message : error.message
         }
-        Response(req, res, 400, jsonObject)
+        return Response(req, res, 400, jsonObject)
         
     }
 

@@ -1,0 +1,37 @@
+*** Audience detail ***
+
+Number of hospital will use our website = 70
+Number of doctor will be registered on our website = 150
+Number of user of our website = 1000
+
+
+*** User Actions ***
+
+1000    Bed Booking/Cancellation
+Appointment Booking/Cancellation        
+Access Doctors
+Access Hospital
+Profile Change (Not a priority)
+
+
+
+*** Doctor Actions ***
+
+View Appointments
+View schedule
+Verify Schedule
+Profile Change(Not a priority)
+Verify Schedules
+
+
+
+
+*** Hospital Actions ***
+
+add Doctor
+Veiw Appointment
+Add/Update/delete schedule
+Receipt generate
+view Bed booked
+update hospital Details.(Not a priority)
+
